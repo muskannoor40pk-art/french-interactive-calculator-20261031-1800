@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculatrice Interactive</title>
+    
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="container">
+    <div class="main-calc">
+        <div class="controls">
+            <button onclick="toggleTheme()">🌓 Thème</button>
+            <button onclick="clearHistory()">🗑️</button>
+        </div>
+        <input type="text" id="display" readonly value="0">
+        <div class="buttons">
+            <button onclick="clearDisplay()">C</button>
+            <button onclick="deleteLast()">⌫</button>
+            <button class="op" onclick="append('/')">/</button>
+            <button class="op" onclick="append('*')">×</button>
+            <button onclick="append('7')">7</button>
+            <button onclick="append('8')">8</button>
+            <button onclick="append('9')">9</button>
+            <button class="op" onclick="append('-')">-</button>
+            <button onclick="append('4')">4</button>
+            <button onclick="append('5')">5</button>
+            <button onclick="append('6')">6</button>
+            <button class="op" onclick="append('+')">+</button>
+            <button onclick="append('1')">1</button>
+            <button onclick="append('2')">2</button>
+            <button onclick="append('3')">3</button>
+            <button class="equal" onclick="calculate()">=</button>
+            <button onclick="append('0')">0</button>
+            <button onclick="append(',')">,</button>
+        </div>
+    </div>
+    <div class="history" id="history">
+        <h3>Historique</h3>
+    </div>
+</div>
+
+<script>
+    const display = document.getElementById('display');
+    const historyEl = document.getElementById('history');
+
+    function append(val) {
+        if (display.value === '0' && val !== ',') display.value = val;
+        else display.value += val;
+    }
+
+    function clearDisplay() { display.value = '0'; }
+
+    function deleteLast() {
+        display.value = display.value.slice(0, -1) || '0';
+    }
+
+    function calculate() {
+        try {
+            const expression = display.value.replace(',', '.');
+            const result = eval(expression);
+            const formattedResult = result.toLocaleString('fr-FR');
+            
+            addToHistory(display.value + ' = ' + formattedResult);
+            display.value = formattedResult;
+        } catch {
+            display.value = 'Erreur';
+            setTimeout(clearDisplay, 1000);
+        }
+    }
+
+    function addToHistory(entry) {
+        const div = document.createElement('div');
+        div.className = 'history-item';
+        div.textContent = entry;
+        historyEl.prepend(div);
+    }
+
+    function clearHistory() {
+        historyEl.innerHTML = '<h3>Historique</h3>';
+    }
+
+    function toggleTheme() {
+        document.body.dataset.theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key >= '0' && e.key <= '9') append(e.key);
+        if (e.key === '+') append('+');
+        if (e.key === '-') append('-');
+        if (e.key === '*') append('*');
+        if (e.key === '/') append('/');
+        if (e.key === 'Enter') calculate();
+        if (e.key === 'Backspace') deleteLast();
+        if (e.key === 'Escape') clearDisplay();
+    });
+</script>
+</body>
+</html>
